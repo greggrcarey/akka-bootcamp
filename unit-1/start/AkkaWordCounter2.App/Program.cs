@@ -10,21 +10,21 @@ var hostBuilder = new HostBuilder();
 hostBuilder
     .ConfigureAppConfiguration((context, builder) =>
     {
-            builder.AddJsonFile("appSettings.json", optional: true)
-                    .AddJsonFile($"appSettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
-                    .AddEnvironmentVariables();
+        builder.AddJsonFile("appSettings.json", optional: true)
+                .AddJsonFile($"appSettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
     }).ConfigureServices((context, services) =>
-        {
-            services.AddWordCounterSettings();
-            services.AddHttpClient(); // needed for IHttpClientFactory
+    {
+        services.AddWordCounterSettings();
+        services.AddHttpClient(); // needed for IHttpClientFactory
 
-            services.AddAkka("MyActorSystem", (builder, sp) =>
+        services.AddAkka("MyActorSystem", (builder, sp) =>
+        {
+            builder.ConfigureLoggers(logConfig =>
             {
-                builder.ConfigureLoggers(logConfig =>
-                {
-                    logConfig.AddLoggerFactory();
-                });
+                logConfig.AddLoggerFactory();
             });
+        });
     });
 
 var host = hostBuilder.Build();
