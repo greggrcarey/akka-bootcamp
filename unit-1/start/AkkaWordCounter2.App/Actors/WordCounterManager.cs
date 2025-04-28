@@ -10,12 +10,12 @@ public sealed class WordCounterManager : ReceiveActor
         {
             string childName = $"word-counter-{HttpUtility.UrlEncode(s.DocumentId.ToString())}";
             IActorRef child = Context.Child(childName);
-            if(child.IsNobody())
+            if (child.IsNobody())
             {
                 //start the child if it doesn't exist
                 child = Context.ActorOf(Props.Create(() => new DocumentWordCounter(s.DocumentId)), childName);
-                child.Forward(s);
             }
+            child.Forward(s);
         });
     }
 }
