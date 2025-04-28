@@ -1,21 +1,30 @@
 ﻿using Akka.Hosting;
-using AkkaWordCounter2.App;
+using AkkaWordCounter2.App.Config;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var hostBuilder = new HostBuilder();
+//https://petabridge.com/bootcamp/lessons/unit-1/akkadotnet-sagas/
 
-hostBuilder.ConfigureServices((context, services) =>
+hostBuilder
+    .ConfigureAppConfiguration((context, builder) =>
     {
-        services.AddHttpClient(); // needed for IHttpClientFactory
-
-        services.AddAkka("MyActorSystem", (builder, sp) =>
+            builder.AddJsonFile("appSettings.json", optional: true)
+                    .AddJsonFile($"appSettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true)
+                    .AddEnvironmentVariables();
+    }).ConfigureServices((context, services) =>
         {
-            builder.ConfigureLoggers(logConfig =>
+            services.AddWordCounterSettings();
+            services.AddHttpClient(); // needed for IHttpClientFactory
+
+            services.AddAkka("MyActorSystem", (builder, sp) =>
             {
-                logConfig.AddLoggerFactory();
+                builder.ConfigureLoggers(logConfig =>
+                {
+                    logConfig.AddLoggerFactory();
+                });
             });
-        });
     });
 
 var host = hostBuilder.Build();
