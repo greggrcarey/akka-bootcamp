@@ -28,5 +28,21 @@ public static class ActorConfigurations
             registry.Register<ParserActor>(actor);
         });
     }
+    public static AkkaConfigurationBuilder AddJobActor(this AkkaConfigurationBuilder builder)
+    {
+        return builder.WithActors((system, registry, resolver) =>
+        {
+            var props = resolver.Props<WordCountJobActor>();
+            var actor = system.ActorOf(props, "job");
+            registry.Register<WordCountJobActor>(actor);
+        });
+    }
+    public static AkkaConfigurationBuilder AddApplicationActors(this AkkaConfigurationBuilder builder)
+    {
+        return builder
+            .AddWordCounterActor()
+            .AddParserActors()
+            .AddJobActor();
+    }
 
 }
